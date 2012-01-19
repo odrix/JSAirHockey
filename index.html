@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <!-- disable zooming -->
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+	    <script type="text/javascript" src="js/plateau.js"></script>
+	    <script type="text/javascript" src="js/joueur.js"></script>
+	    <script type="text/javascript" src="js/palet.js"></script>
+	    <script type="text/javascript" src="js/techDevice.js"></script>
+	    <script type="text/javascript" src="js/collisions.js"></script>
+    </head>
+	<body onload="init();">
+	    <div id="score"></div>
+	    <canvas id="plateauFond" width="500" height="700" style="z-index:1;position:absolute;top:0;left:0;" >
+			pas de chance
+		</canvas>
+		<canvas id="plateau" width="500" height="700" style="z-index:2;position:absolute;top:0;left:0;">
+			pas de chance
+		</canvas>
+		<script>
+
+
+
+function afficheScore() {
+    document.getElementById("score").innerHTML= "Score <br/> Adversaire: " + env.score.adversaire + " - Moi: " + env.score.moi;
+}
+
+function calculScore(pal, currentBut) {
+    var ecart=5;
+    if(pal.y < currentBut.y + ecart && pal.y > currentBut.y - ecart)
+    {
+        if(currentBut.type === 'moi'){
+            env.score.adversaire += 1;
+        } else if(currentBut.type === 'adversaire') {
+            env.score.moi +=1;
+        }
+        afficheScore();
+        reInitPaletPoussoir();
+        writeInConsole("but chez " + currentBut.type);
+    } else {
+	writeInConsole("presque : " + pal.y + " - " + currentBut.y);
+    }
+}
+
+function update() {
+    var dt = 0.05;
+    var isBut = null;
+
+    if (savedMouseCoords != null && selectOffset != null) {
+        joueur.bouger(savedMouseCoords.x - selectOffset.x, savedMouseCoords.y - selectOffset.y);
+    }
+    collisionPaletpoussoir(joueur, ballon);
+
+    ballon.bougerSeul();
+    isBut = collisionPaletBut(ballon, env.buts)
+    if (isBut === false) {
+        collisionPaletEnv(ballon, env);
+    } else {
+        calculScore(ballon, isBut);
+    }
+}
+
+function draw() {
+    var canvas = document.getElementById("plateau");
+    
+    if (canvas.getContext == null) {
+        return;
+    }
+    var context = canvas.getContext("2d");
+    
+    context.clearRect(0, 0, env.width, env.height);
+    joueur.dessine(context);
+    ballon.dessine(context);
+}
+
+function timeout() {
+    draw();
+    update();
+
+    if (stopped == false) {
+        setTimeout('timeout()', 30);
+    }
+}
+
+
+var env = null;
+var scaleFactor = 1.0;
+var blobColl;
+var gravity;
+var stopped;
+var savedMouseCoords = null;
+var selectOffset = null;
+var joueur = null;
+var adversaire = null;
+var ballon = null;
+const taillepoussoir = 30;
+const taillePalet = 20;
+
+function reInitPaletPoussoir() {
+    joueur.x = env.width / 2;
+    joueur.y = env.height * 3 / 4;
+    joueur.lastPoints = null;
+    joueur.attrape = false;
+
+    ballon.x = env.width / 2;
+    ballon.y = env.height / 2;
+    ballon.vx = ballon.vy = ballon.force = 0;
+}
+
+function init() {
+    stopped = false;
+    env = new environnement(500.0, 700.0);
+    joueur = new poussoir(env.width / 2, env.height * 3 / 4, taillepoussoir);
+    ballon = new palet(env.width / 2, env.height / 2, taillePalet);
+    
+    env.buts[0] = new but(200, 0, 130, 'adversaire');
+    env.buts[1] = new but(200, 700, 130, 'moi');
+    
+    env.dessine();
+    timeout(); 
+    
+    document.onmousedown = onStart;
+    document.onmouseup = onEnd;
+    document.onmousemove = onMove;
+
+    document.ontouchstart = onStart;
+    document.ontouchend = onEnd;
+    document.ontouchmove = onMove;
+}
+
+
+function writeInConsole(text) {
+    if (typeof console !== 'undefined') {
+        console.log(text);
+    }
+}
+
+		</script>
+	</body>
+</html>
