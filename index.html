@@ -1,12 +1,13 @@
 <html>
     <head>
         <!-- disable zooming -->
-	    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+	    <meta name="viewport" content="height=device-height, initial-scale=2.0, user-scalable=yes" >
 	    <script type="text/javascript" src="js/plateau.js"></script>
 	    <script type="text/javascript" src="js/joueur.js"></script>
 	    <script type="text/javascript" src="js/palet.js"></script>
 	    <script type="text/javascript" src="js/techDevice.js"></script>
 	    <script type="text/javascript" src="js/collisions.js"></script>
+	    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
     </head>
 	<body onload="init();">
 	    <div id="score"></div>
@@ -49,6 +50,7 @@ function update() {
         joueur.bouger(savedMouseCoords.x - selectOffset.x, savedMouseCoords.y - selectOffset.y);
     }
     collisionPaletpoussoir(joueur, ballon);
+    collisionPaletpoussoir(adversaire, ballon);
 
     ballon.bougerSeul();
     isBut = collisionPaletBut(ballon, env.buts)
@@ -69,6 +71,7 @@ function draw() {
     
     context.clearRect(0, 0, env.width, env.height);
     joueur.dessine(context);
+    adversaire.dessine(context);
     ballon.dessine(context);
 }
 
@@ -92,6 +95,7 @@ var selectOffset = null;
 var joueur = null;
 var adversaire = null;
 var ballon = null;
+var socket = null;
 const taillepoussoir = 30;
 const taillePalet = 20;
 
@@ -110,10 +114,28 @@ function init() {
     stopped = false;
     env = new environnement(500.0, 700.0);
     joueur = new poussoir(env.width / 2, env.height * 3 / 4, taillepoussoir);
+    adversaire = new poussoir(env.width / 2, env.height / 4, taillepoussoir);
     ballon = new palet(env.width / 2, env.height / 2, taillePalet);
     
     env.buts[0] = new but(200, 0, 130, 'adversaire');
     env.buts[1] = new but(200, 700, 130, 'moi');
+
+    // evenements du serveur
+    socket = io.connect('http://localhost:8080');
+    socket.on('debutJeu', function(data) {
+	    alert('Debut de la partie!');
+    });
+    socket.on('BougerSeul', function(data) {
+	    adversaire.bougerSeul(data.x, data.y);
+    });
+    socket.on('ChangerPalet', function(data) {
+    	  var newAngle = Math.atan2(data.vy, data.vx);
+	  newAngle = 2 * Math.PI - newAngle;
+	  ballon.bougera(newAngle, data.force, true);
+    });
+    socket.on('departAdversaire', function() {
+	    alert('votre adversaire est parti');
+    });
     
     env.dessine();
     timeout(); 

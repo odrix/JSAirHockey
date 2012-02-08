@@ -38,8 +38,15 @@ poussoir.prototype.bouger = function(x, y) {
     if (x - this.taille >= this.limits.x && x <= this.limits.width + this.limits.x - this.taille && y - this.taille >= this.limits.y && y <= this.limits.height + this.limits.y - this.taille) {
         this.x = x;
         this.y = y;
+	socket.emit('Bouge', {x: x, y: y});
         if (this.lastPoints == null)
             this.lastPoints = new Array();
         this.lastPoints.push({ x: this.x, y: this.y });
     }
+}
+
+// pour le retour du serveur: affichage en mirroir
+poussoir.prototype.bougerSeul = function(x, y) {
+	this.x = env.width - x;
+	this.y = env.height - y;
 }

@@ -29,17 +29,27 @@ palet.prototype.bougerSeul = function() {
     }
 }
 
-palet.prototype.bougera = function(angle, force) {
+palet.prototype.bougera = function(angle, force, noEmitChangeDirection ) {
     this.force = force;
     this.vx = Math.cos(angle);
     this.vy = Math.sin(angle);
+    if(noEmitChangeDirection == 'undefined' || noEmitChangeDirection == false) {
+	    this.emitChangeDirection();
+    }
     writeInConsole("angle: " + angle + " - force: " + force);
 }
 
 palet.prototype.rebondirHorizontal = function() {
     this.vy = -1 * this.vy;
+    this.emitChangeDirection();
 }
 
 palet.prototype.rebondirVertical = function() {
     this.vx = -1 * this.vx;
+    this.emitChangeDirection();
+}
+
+// envoi des informations de direction du palet au serveur
+palet.prototype.emitChangeDirection = function() {
+	socket.emit('PaletChange', {vx: this.vx, vy: this.vy, force: this.force});
 }

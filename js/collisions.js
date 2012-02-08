@@ -6,20 +6,19 @@ function collisionPaletpoussoir(frap, pal) {
     AxBx = pal.x - frap.x;
     AyBy = pal.y - frap.y;
     dist = Math.sqrt(AxBx * AxBx + AyBy * AyBy);
-    if (dist <= frap.taille + pal.taille && frap.lastPoints != null && frap.lastPoints.length > 20) {
-        // il y'a bien colision
-        p1 = frap.lastPoints[frap.lastPoints.length - 1];
-        p2 = frap.lastPoints[frap.lastPoints.length - 10];
-        //        //        for (i = 0; i < frap.lastPoints.length; i++) {
-        ////            pTest = frap.lastPoints[i];
-        ////            if (ecartAutorise < Math.abs((coefCourb  * (p2.x - pTest.x) + offsetCourb) - pTest.y)) {
-        ////                break ;
-        ////            }
-        //        //        }
-        angle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
-        pal.bougera(angle, 80);
-        frap.lastPoints = null;
-        return true;
+    if (dist <= frap.taille + pal.taille) {
+	    if(frap.lastPoints != null && frap.lastPoints.length > 20) {
+		// il y'a bien colision
+		p1 = frap.lastPoints[frap.lastPoints.length - 1];
+		p2 = frap.lastPoints[frap.lastPoints.length - 10];
+		angle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+		pal.bougera(angle, 80);
+		frap.lastPoints = null;
+		return true;
+	} else {
+		pal.rebondirHorizontal();
+		pal.rebondirVertical();
+	}
     }
     return false;
 }
