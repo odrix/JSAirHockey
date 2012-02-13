@@ -29,16 +29,10 @@ function calculScore(pal, currentBut) {
     var ecart=5;
     if(pal.y < currentBut.y + ecart && pal.y > currentBut.y - ecart)
     {
-        if(currentBut.type === 'moi'){
-            env.score.adversaire += 1;
-        } else if(currentBut.type === 'adversaire') {
+        if(currentBut.type === 'adversaire') {
+	    socket.emit("butMarque");
             env.score.moi +=1;
         }
-        afficheScore();
-        reInitPaletPoussoir();
-        writeInConsole("but chez " + currentBut.type);
-    } else {
-	writeInConsole("presque : " + pal.y + " - " + currentBut.y);
     }
 }
 
@@ -50,7 +44,6 @@ function update() {
         joueur.bouger(savedMouseCoords.x - selectOffset.x, savedMouseCoords.y - selectOffset.y);
     }
     collisionPaletpoussoir(joueur, ballon);
-    collisionPaletpoussoir(adversaire, ballon);
 
     ballon.bougerSeul();
     isBut = collisionPaletBut(ballon, env.buts)
@@ -105,6 +98,9 @@ function reInitPaletPoussoir() {
     joueur.lastPoints = null;
     joueur.attrape = false;
 
+    adversaire.x = env.width / 2;
+    adversaire.y = env.height / 4;
+
     ballon.x = env.width / 2;
     ballon.y = env.height / 2;
     ballon.vx = ballon.vy = ballon.force = 0;
@@ -129,6 +125,7 @@ function init() {
 	    adversaire.bougerSeul(data.x, data.y);
     });
     socket.on('ChangerPalet', function(data) {
+	    writeInConsole("ev change direction palet - vx: " + data.vx + " - vy: " + data.vy + " - force: " + data.force);
     	  var newAngle = Math.atan2(data.vy, data.vx);
 	  newAngle = 2 * Math.PI - newAngle;
 	  ballon.bougera(newAngle, data.force, true);
@@ -136,8 +133,14 @@ function init() {
     socket.on('departAdversaire', function() {
 	    alert('votre adversaire est parti');
     });
+    socket.on('ChangerScore', function(data) {
+	    env.score = data;
+	    reInitPaletPoussoir();
+	    afficheScore();
+    });
     
     env.dessine();
+    socket.emit('envoiNom', {nom:'toto'});
     timeout(); 
     
     document.onmousedown = onStart;

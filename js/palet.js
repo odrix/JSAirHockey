@@ -33,7 +33,8 @@ palet.prototype.bougera = function(angle, force, noEmitChangeDirection ) {
     this.force = force;
     this.vx = Math.cos(angle);
     this.vy = Math.sin(angle);
-    if(noEmitChangeDirection == 'undefined' || noEmitChangeDirection == false) {
+
+    if(noEmitChangeDirection == undefined || noEmitChangeDirection == false) {
 	    this.emitChangeDirection();
     }
     writeInConsole("angle: " + angle + " - force: " + force);
@@ -52,4 +53,5 @@ palet.prototype.rebondirVertical = function() {
 // envoi des informations de direction du palet au serveur
 palet.prototype.emitChangeDirection = function() {
 	socket.emit('PaletChange', {vx: this.vx, vy: this.vy, force: this.force});
+	writeInConsole("emitChangeDirection");
 }

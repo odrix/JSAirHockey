@@ -1,16 +1,19 @@
-function poussoir(initX, initY, taille, limits) {
+function poussoir(initX, initY, taille, limits, couleur) {
     this.taille = taille;
     this.x = initX;
     this.y = initY;
     this.attrape = false;
     this.lastPoints = null;
     this.limits = limits || { x: 0, y: 0, width: env.width, height: env.height };
+    this.name = '';
+    this.couleur = couleur || "#8ED6FF";
+    this.nbButs = 0;
 }
 
 poussoir.prototype.dessine = function(ctx) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.taille, 0, 2 * Math.PI, false);
-    ctx.fillStyle = "#8ED6FF";
+    ctx.fillStyle = this.couleur;
     ctx.fill();
     ctx.lineWidth = 5;
     ctx.strokeStyle = "black";

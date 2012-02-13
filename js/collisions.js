@@ -7,7 +7,7 @@ function collisionPaletpoussoir(frap, pal) {
     AyBy = pal.y - frap.y;
     dist = Math.sqrt(AxBx * AxBx + AyBy * AyBy);
     if (dist <= frap.taille + pal.taille) {
-	    if(frap.lastPoints != null && frap.lastPoints.length > 20) {
+	if(frap.lastPoints != null && frap.lastPoints.length > 20) {
 		// il y'a bien colision
 		p1 = frap.lastPoints[frap.lastPoints.length - 1];
 		p2 = frap.lastPoints[frap.lastPoints.length - 10];
