@@ -1,0 +1,43 @@
+#login {
+	position: absolute;
+	left: auto;
+	right: auto;
+	top: -150px;
+	width: 300px;
+	border: solid 3px white;
+	background: green;
+	padding:6px;
+	/*-webkit-transition:all 1.0s ease-in-out;
+	-moz-transition:all 1.0s ease-in-out;
+	-o-transition:all 1.0s ease-in-out;
+	-ms-transition:all 1.0s ease-in-out;	
+	transition:all 1.0s ease-in-out;*/
+	z-index:10;
+}
+
+#login label { width:100%;display:block; }
+#txtNom { width: 200px; }
+.btnReseau { width: 130px;margin: 6px 3px; }
+
+
+@-moz-keyframes moz-ArriveLogin{
+    0% { top:-100px; }
+    30%  { top:180px; }
+    50%   { top:150px; }
+    65%  { top:180px; }
+    100%   { top:150px; }
+}
+
+@-webkit-keyframes wk-ArriveLogin{
+    0% { top:-100px; }
+    30%  { top:180px; }
+    50%   { top:150px; }
+    65%  { top:180px; }
+    100%   { top:150px; }
+}
+
+.ArriveLoginAnim {
+	-webkit-animation: wk-ArriveLogin 2s ease-in-out forwards;
+	-moz-animation: moz-ArriveLogin 2s ease-in-out forwards;
+	animation: ArriveLogin 2s ease-in-out forwards;
+}

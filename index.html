@@ -2,14 +2,17 @@
     <head>
         <!-- disable zooming -->
 	    <meta name="viewport" content="height=device-height, initial-scale=2.0, user-scalable=yes" >
+	    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
 	    <script type="text/javascript" src="js/plateau.js"></script>
 	    <script type="text/javascript" src="js/joueur.js"></script>
 	    <script type="text/javascript" src="js/palet.js"></script>
 	    <script type="text/javascript" src="js/techDevice.js"></script>
 	    <script type="text/javascript" src="js/collisions.js"></script>
-	    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+	    <!-- <script src="http://localhost:8080/socket.io/socket.io.js"></script >-->
+	    <script src="http://jsairhockey.nodester.com/socket.io/socket.io.js"></script>
     </head>
-	<body onload="init();">
+	<body>
 	    <div id="score"></div>
 	    <canvas id="plateauFond" width="500" height="700" style="z-index:1;position:absolute;top:0;left:0;" >
 			pas de chance
@@ -17,8 +20,20 @@
 		<canvas id="plateau" width="500" height="700" style="z-index:2;position:absolute;top:0;left:0;">
 			pas de chance
 		</canvas>
-		<script>
+		<div id="login">
+			<label>Nom/Pseudo</label>
+			<input type="text" id="txtNom" /><button id="btnOk">Ok</button>
+			<button id="btnFacebook" class="btnReseau">Facebook</button><button id="btnTwitter" class="btnReseau">Twitter</Twitter>
+		</div>
+<script>
 
+	$(document).ready(function() {
+		$("#login").addClass("ArriveLoginAnim");
+//		$("#login").css("top","150");
+		$("#btnOk").click(function() {
+			init($("#txtNom").val());
+		});
+	});
 
 
 function afficheScore() {
@@ -106,7 +121,7 @@ function reInitPaletPoussoir() {
     ballon.vx = ballon.vy = ballon.force = 0;
 }
 
-function init() {
+function init(nomJoueur) {
     stopped = false;
     env = new environnement(500.0, 700.0);
     joueur = new poussoir(env.width / 2, env.height * 3 / 4, taillepoussoir);
@@ -117,9 +132,15 @@ function init() {
     env.buts[1] = new but(200, 700, 130, 'moi');
 
     // evenements du serveur
-    socket = io.connect('http://localhost:8080');
+    //socket = io.connect('http://localhost:8080');
+    socket = io.connect('http://jsairhockey.nodester.com');
+    socket.emit('envoiNom', {nom: nomJoueur});
+
     socket.on('debutJeu', function(data) {
 	    alert('Debut de la partie!');
+	    $("#login").css('top', '-1000px');
+	    env.dessine();
+	    timeout(); 
     });
     socket.on('BougerSeul', function(data) {
 	    adversaire.bougerSeul(data.x, data.y);
@@ -139,9 +160,6 @@ function init() {
 	    afficheScore();
     });
     
-    env.dessine();
-    socket.emit('envoiNom', {nom:'toto'});
-    timeout(); 
     
     document.onmousedown = onStart;
     document.onmouseup = onEnd;
